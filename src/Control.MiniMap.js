@@ -9,13 +9,14 @@ L.Control.MiniMap = L.Control.extend({
 		width: 150,
 		height: 150,
 		aimingRectOptions: {color: "#ff7800", weight: 1, clickable: false},
-		shadowRectOptions: {color: "#000000", weight: 1, clickable: false, opacity:0, fillOpacity:0}
+		shadowRectOptions: {color: "#000000", weight: 1, clickable: false, opacity:0, fillOpacity:0},
+		wrapper: ''
 	},
-	
+
 	hideText: 'Hide MiniMap',
-	
+
 	showText: 'Show MiniMap',
-	
+
 	//layer is the map layer to be shown in the minimap
 	initialize: function (layer, options) {
 		L.Util.setOptions(this, options);
@@ -24,7 +25,7 @@ L.Control.MiniMap = L.Control.extend({
 		this.options.shadowRectOptions.clickable = false;
 		this._layer = layer;
 	},
-	
+
 	onAdd: function (map) {
 
 		this._mainMap = map;
@@ -38,17 +39,17 @@ L.Control.MiniMap = L.Control.extend({
 
 
 		this._miniMap = new L.Map(this._container,
-		{
-			attributionControl: false,
-			zoomControl: false,
-			zoomAnimation: this.options.zoomAnimation,
-			autoToggleDisplay: this.options.autoToggleDisplay,
-			touchZoom: !this.options.zoomLevelFixed,
-			scrollWheelZoom: !this.options.zoomLevelFixed,
-			doubleClickZoom: !this.options.zoomLevelFixed,
-			boxZoom: !this.options.zoomLevelFixed,
-			crs: map.options.crs
-		});
+			{
+				attributionControl: false,
+				zoomControl: false,
+				zoomAnimation: this.options.zoomAnimation,
+				autoToggleDisplay: this.options.autoToggleDisplay,
+				touchZoom: !this.options.zoomLevelFixed,
+				scrollWheelZoom: !this.options.zoomLevelFixed,
+				doubleClickZoom: !this.options.zoomLevelFixed,
+				boxZoom: !this.options.zoomLevelFixed,
+				crs: map.options.crs
+			});
 
 		this._miniMap.addLayer(this._layer);
 
@@ -78,9 +79,19 @@ L.Control.MiniMap = L.Control.extend({
 	},
 
 	addTo: function (map) {
-		L.Control.prototype.addTo.call(this, map);
+
+		if(this.options.wrapper) {
+			this._container = this.onAdd(map);
+			this._wrapper = L.DomUtil.get(this.options.wrapper);
+			this._wrapper.style.position = 'relative';
+			this._wrapper.appendChild(this._container);
+		} else {
+			L.Control.prototype.addTo.call(this, map);
+		}
+
 		this._miniMap.setView(this._mainMap.getCenter(), this._decideZoom(true));
 		this._setDisplay(this._decideMinimized());
+
 		return this;
 	},
 
@@ -94,7 +105,7 @@ L.Control.MiniMap = L.Control.extend({
 
 	_addToggleButton: function () {
 		this._toggleDisplayButton = this.options.toggleDisplay ? this._createButton(
-				'', this.hideText, 'leaflet-control-minimap-toggle-display', this._container, this._toggleDisplayButtonClicked, this) : undefined;
+			'', this.hideText, 'leaflet-control-minimap-toggle-display', this._container, this._toggleDisplayButtonClicked, this) : undefined;
 	},
 
 	_createButton: function (html, title, className, container, fn, context) {
@@ -156,7 +167,7 @@ L.Control.MiniMap = L.Control.extend({
 			this._container.style.width = this.options.width + 'px';
 			this._container.style.height = this.options.height + 'px';
 			this._toggleDisplayButton.className = this._toggleDisplayButton.className
-					.replace(/(?:^|\s)minimized(?!\S)/g, '');
+				.replace(/(?:^|\s)minimized(?!\S)/g, '');
 		}
 		else {
 			this._container.style.display = 'block';
@@ -211,7 +222,7 @@ L.Control.MiniMap = L.Control.extend({
 				var currentDiff = this._miniMap.getZoom() - this._mainMap.getZoom();
 				var proposedZoom = this._miniMap.getZoom() - this.options.zoomLevelOffset;
 				var toRet;
-				
+
 				if (currentDiff > this.options.zoomLevelOffset && this._mainMap.getZoom() < this._miniMap.getMinZoom() - this.options.zoomLevelOffset) {
 					//This means the miniMap is zoomed out to the minimum zoom level and can't zoom any more.
 					if (this._miniMap.getZoom() > this._lastMiniMapZoom) {
