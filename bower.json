@@ -1,0 +1,23 @@
+{
+  "name": "pagina-leaflet-minimap",
+  "version": "1.0.0",
+  "homepage": "https://github.com/paginagmbh/Leaflet-MiniMap",
+  "description": "A minimap control plugin for Leaflet - customized by pagina GmbH",
+  "keywords": [
+    "leaflet",
+    "minimap",
+    "pagina"
+  ],
+  "authors": [
+    "Marc Diem"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
